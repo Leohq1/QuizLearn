@@ -1,0 +1,73 @@
+nav {
+    background-color: #333;
+    color: white;
+    padding: 10px 0;
+    height: 100%;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.nav-list {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+}
+
+.nav-list li {
+    margin: 0 15px;
+}
+
+.nav-list li a {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    padding: 8px 12px;
+    transition: background-color 0.3s ease;
+}
+
+.page:hover {
+    background-color: #555;
+    border-radius: 4px;
+}
+
+.nav-list .logo img {
+    height: 75px;
+    width: 75px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease; /* Smooth hover effect */
+}
+
+.nav-list .logo a:hover img { 
+    transform: scale(1.25); /* Slightly scale up the logo on hover */ 
+} 
+
+.content {
+    /* Centers horizontally */
+    flex-grow: 1; 
+    align-items: center;
+    /* Centers vertically */
+    display: flex; 
+    justify-content: center;
+    flex-direction: column; /* Creates lines as needed */ 
+}
+
+.content h1 {
+    margin-bottom: 20px;
+}
+
+.content p {
+    font-size: 1.2em;
+    color: #666;
+}
