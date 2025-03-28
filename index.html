@@ -3,22 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcard App</title>
+    <title>Flashcard</title>
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <h1>Flashcard App</h1>
-    <div class="flashcard" onclick="flipCard(this)">
-        Question: What is the capital of France?
+    <h1>FlashLearn</h1>
+    <div class="flashcard">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">
+                What is the capital of France?
+            </div>
+            <div class="flashcard-back">
+                Paris
+            </div>
+        </div>
     </div>
-    <script>
-        function flipCard(card) {
-            if (card.innerText.includes('Question')) {
-                card.innerText = 'Answer: Paris';
-            } else {
-                card.innerText = 'Question: What is the capital of France?';
-            }
-        }
-    </script>
 </body>
 </html>
