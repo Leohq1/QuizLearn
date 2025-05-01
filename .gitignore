@@ -1,0 +1,34 @@
+# General
+.DS_Store
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Firebase specifics
+.firebase
+firebase-debug.log
+
+# Environment variables - VERY IMPORTANT!
+.env
+.env.*
+!/.env.example
+
+# Build artifacts
+dist/
+build/
+tmp/
+
+# IDE specific
+.idea/
+.vscode/
+
+# Logs
+logs/
+*.log
+
+# Dependency directories
+/lib
+/jspm_packages
+
+# Optional: Ignore your personal API keys file (if you have one)
+keys.js
