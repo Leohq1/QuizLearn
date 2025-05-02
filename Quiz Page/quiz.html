@@ -21,27 +21,53 @@
     </nav>
 
     <div id="quiz-container">
-        <div class="question">
-            <p>What is the capital of France?</p>
-            <div class="options">
-                <label class="option-block">
-                    <input type="radio" name="question1" value="London">
-                    London
-                </label>
-                <label class="option-block">
-                    <input type="radio" name="question1" value="Berlin">
-                    Berlin
-                </label>
-                <label class="option-block">
-                    <input type="radio" name="question1" value="Paris">
-                    Paris
-                </label>
-                <label class="option-block">
-                    <input type="radio" name="question1" value="Rome">
-                    Rome
-                </label>
+        <form id="quiz-form">
+            <div class="question">
+                <p>What is the capital of France?</p>
+                <div class="options">
+                    <label class="option-block">
+                        <input type="radio" name="question1" value="London">
+                        London
+                    </label>
+                    <label class="option-block">
+                        <input type="radio" name="question1" value="Berlin">
+                        Berlin
+                    </label>
+                    <label class="option-block">
+                        <input type="radio" name="question1" value="Paris">
+                        Paris
+                    </label>
+                    <label class="option-block">
+                        <input type="radio" name="question1" value="Rome">
+                        Rome
+                    </label>
+                </div>
             </div>
-        </div>
+            <button type="submit" id="submit-btn">Submit</button>
+            <p id="result"></p>
+        </form>
     </div>
+
+    <script>
+        document.getElementById("quiz-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent form refresh
+            const answer = document.querySelector('input[name="question1"]:checked');
+            const result = document.getElementById("result");
+
+            if (!answer) {
+                result.textContent = "Please select an answer.";
+                result.style.color = "orange";
+                return;
+            }
+
+            if (answer.value === "Paris") {
+                result.textContent = "Correct! 🎉";
+                result.style.color = "green";
+            } else {
+                result.textContent = "Incorrect. The correct answer is Paris.";
+                result.style.color = "red";
+            }
+        });
+    </script>
 </body>
 </html>
