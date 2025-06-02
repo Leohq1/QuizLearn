@@ -32,3 +32,4 @@ logs/
 
 # Optional: Ignore your personal API keys file (if you have one)
 keys.js
+serviceAccountKey.json
