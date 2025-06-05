@@ -1,13 +1,15 @@
 body {
     font-family: 'Comic Sans MS', cursive, sans-serif;
     background: linear-gradient(135deg, #f6d365, #fda085);
-    justify-content: center;
-    align-items: center;
+    /* justify-content: center; */
+    /* align-items: center; */
     text-align: center;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     animation: backgroundPulse 10s infinite alternate;
+    margin: 0;
+    padding: 0; 
 }
 
 @keyframes backgroundPulse {
