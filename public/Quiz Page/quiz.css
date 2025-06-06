@@ -1,13 +1,15 @@
 body {
     font-family: 'Comic Sans MS', cursive, sans-serif;
     background: linear-gradient(135deg, #f6d365, #fda085);
-    justify-content: center;
-    align-items: center;
+    /* justify-content: center; */
+    /* align-items: center; */
     text-align: center;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     animation: backgroundPulse 10s infinite alternate;
+    margin: 0;
+    padding: 0; 
 }
 
 @keyframes backgroundPulse {
@@ -100,4 +102,28 @@ body {
     appearance: none;
     width: 0;
     height: 0;
+}
+
+#submit-btn {
+    margin-top: 20px;
+    padding: 12px 24px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #42e695, #3bb2b8);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(59, 178, 184, 0.4);
+    transition: transform 0.2s ease;
+}
+
+#submit-btn:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+}
+
+#result {
+    margin-top: 15px;
+    font-size: 1.3em;
+    font-weight: bold;
 }
