@@ -14,8 +14,8 @@ firebase.initializeApp(firebaseConfig);
 // Get a reference to the Firestore service (using the global 'firebase' object)
 const db = firebase.firestore();
 
-// --- Rest of your quiz.js code ---
-const QUIZ_DOCUMENT_ID = 'wF4qEndHY4E2nsjNvJ2r'; 
+// --- Rest of your quiz.js code (unchanged from previous correct version) ---
+const QUIZ_DOCUMENT_ID = 'wF4qEndHY4E2nsjNvJ2r'; // <--- CHANGE THIS to your quiz document ID
 
 let loadedQuestions = [];
 
@@ -77,7 +77,7 @@ async function displayQuiz() {
 
         const input = document.createElement('input');
         input.type = 'radio';
-        input.name = `question_${index}`; // Use a unique name for each question's radio buttons
+        input.name = `question_${index}`;
         input.value = option;
 
         label.appendChild(input);
@@ -111,7 +111,9 @@ async function handleQuizSubmission(event) {
   let answersCount = 0;
   let correctAnswersCount = 0;
 
-  // --- Start of existing quiz logic for checking answers ---
+  resultElement.textContent = "Checking answers...";
+  resultElement.style.color = "gray";
+
   loadedQuestions.forEach((question, index) => {
     const questionName = `question_${index}`;
     const selectedOption = form.querySelector(`input[name="${questionName}"]:checked`);
@@ -119,7 +121,7 @@ async function handleQuizSubmission(event) {
     if (!selectedOption) {
       allCorrect = false;
       console.warn(`Question ${index + 1} was not answered.`);
-      return; // Skip if not answered for scoring purposes
+      return;
     }
 
     answersCount++;
@@ -139,7 +141,6 @@ async function handleQuizSubmission(event) {
       return;
   }
 
-  // Display initial scoring feedback
   if (answersCount < loadedQuestions.length) {
     resultElement.textContent = `You answered ${answersCount} out of ${loadedQuestions.length} questions. You got ${correctAnswersCount} correct. Please answer all questions to get full feedback.`;
     resultElement.style.color = "orange";
@@ -148,57 +149,10 @@ async function handleQuizSubmission(event) {
       resultElement.textContent = `🎉 Congratulations! You got all ${correctAnswersCount} questions correct!`;
       resultElement.style.color = "green";
     } else {
-      resultElement.textContent = `You got ${correctAnswersCount} out of ${loadedQuestions.length} questions correct. Now, let's get some AI feedback!`;
+      resultElement.textContent = `You got ${correctAnswersCount} out of ${loadedQuestions.length} questions correct. Keep practicing!`;
       resultElement.style.color = "red";
     }
   }
-
-  // --- New Flask server integration for AI feedback ---
-  // If the user answered all questions, proceed to get AI feedback
-  if (answersCount === loadedQuestions.length) {
-      resultElement.textContent = "Thinking... 🤖 Getting AI feedback..."; // Update message
-      resultElement.style.color = "gray";
-
-      // Collect all user answers to send to the backend
-      const userAnswers = loadedQuestions.map((question, index) => {
-          const questionName = `question_${index}`;
-          const selectedOption = form.querySelector(`input[name="${questionName}"]:checked`);
-          return {
-              questionText: question.questionText,
-              userAnswer: selectedOption ? selectedOption.value : null,
-              correctAnswer: question.correctAnswer
-          };
-      });
-
-      try {
-          const response = await fetch("http://localhost:5000/get-feedback", {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json"
-              },
-              // Send all questions and user answers
-              body: JSON.stringify({ quizData: userAnswers })
-          });
-
-          const data = await response.json();
-
-          if (data.feedback) {
-              // Append AI feedback below the initial scoring feedback
-              resultElement.innerHTML = resultElement.innerHTML + `<br><br>AI Feedback: ${data.feedback}`;
-              // Color might depend on the overall feedback now, or just keep the previous one
-              // resultElement.style.color can be set based on AI's overall sentiment if available
-          } else {
-              resultElement.innerHTML = resultElement.innerHTML + "<br><br>⚠️ No AI response. Backend error.";
-              resultElement.style.color = "red";
-              console.warn("Backend response did not contain feedback:", data);
-          }
-      } catch (error) {
-          console.error("Fetch error contacting Python server:", error);
-          resultElement.innerHTML = resultElement.innerHTML + "<br><br>❌ Error contacting Python server.";
-          resultElement.style.color = "red";
-      }
-  }
-  // --- End of Flask server integration ---
 }
 
 document.addEventListener('DOMContentLoaded', displayQuiz);
