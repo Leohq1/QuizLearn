@@ -1,91 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Simple Quiz</title>
-  <link rel="stylesheet" href="quiz.css">
-  <link rel="stylesheet" href="../navbar.css">
+    <meta charset="UTF-8">
+    <title>Simple Quiz</title>
+    <link rel="stylesheet" href="quiz.css">
+    <link rel="stylesheet" href="../navbar.css">
 </head>
 <body>
-  <nav>
-    <div class="nav-container">
-      <ul class="nav-list">
-        <li><a class="page" href="flashlearn.html">FlashLearn</a></li>
-        <li class="logo">
-          <a href="../index.html">
-            <img src="logo.jpg" alt="QuizLearn Logo">
-          </a>
-        </li>
-        <li><a class="page" href="quiz.html">Quiz</a></li>
-      </ul>
-    </div>
-  </nav>
-
-  <div id="quiz-container">
-    <form id="quiz-form">
-      <div class="question">
-        <p>What is the capital of France?</p>
-        <div class="options">
-          <label class="option-block">
-            <input type="radio" name="question1" value="London"> London
-          </label>
-          <label class="option-block">
-            <input type="radio" name="question1" value="Berlin"> Berlin
-          </label>
-          <label class="option-block">
-            <input type="radio" name="question1" value="Paris"> Paris
-          </label>
-          <label class="option-block">
-            <input type="radio" name="question1" value="Rome"> Rome
-          </label>
-        </div>
+    <nav>
+      <div class="nav-container">
+        <ul class="nav-list">
+          <li><a class="page" href="flashlearn.html">FlashLearn</a></li>
+          <li class="logo">
+            <a href="../index.html">
+              <img src="../Images/logo.jpg" alt="QuizLearn Logo">
+            </a>
+          </li>
+          <li><a class="page" href="quiz.html">Quiz</a></li>
+        </ul>
       </div>
-      <button type="submit" id="submit-btn">Submit</button>
-      <p id="result"></p>
-    </form>
-  </div>
+    </nav>
 
-  <script>
-    document.getElementById("quiz-form").addEventListener("submit", async function(event) {
-      event.preventDefault();
+    <div id="quiz-container">
+        <form id="quiz-form">
+            <p>Loading quiz...</p>
+        </form>
+    </div>
 
-      const answer = document.querySelector('input[name="question1"]:checked');
-      const result = document.getElementById("result");
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
 
-      if (!answer) {
-        result.textContent = "Please select an answer.";
-        result.style.color = "orange";
-        return;
-      }
-
-      const userAnswer = answer.value;
-      result.textContent = "Thinking... 🤖";
-      result.style.color = "gray";
-
-      try {
-        const response = await fetch("http://localhost:5000/get-feedback", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ userAnswer: userAnswer })
-        });
-
-        const data = await response.json();
-
-        if (data.feedback) {
-          result.textContent = data.feedback;
-          result.style.color = (userAnswer === "Paris") ? "green" : "red";
-        } else {
-          result.textContent = "⚠️ No AI response. Backend error.";
-          result.style.color = "red";
-          console.warn(data);
-        }
-      } catch (error) {
-        console.error("Fetch error:", error);
-        result.textContent = "❌ Error contacting Python server.";
-        result.style.color = "red";
-      }
-    });
-  </script>
+    <script src="quiz.js"></script>
 </body>
 </html>
