@@ -14,8 +14,11 @@ firebase.initializeApp(firebaseConfig);
 // Get a reference to the Firestore service (using the global 'firebase' object)
 const db = firebase.firestore();
 
-// --- Rest of your quiz.js code (unchanged from previous correct version) ---
-const QUIZ_DOCUMENT_ID = 'wF4qEndHY4E2nsjNvJ2r'; // <--- CHANGE THIS to your quiz document ID
+// --- Rest of your quiz.js code ---
+const QUIZ_DOCUMENT_ID = 'wF4qEndHY4E2nsjNvJ2r'; 
+
+// Algebra Quiz: QuXdfitxKgAPYtKOoGMS
+// World's Capitals Quiz doc Id: wF4qEndHY4E2nsjNvJ2r
 
 let loadedQuestions = [];
 
@@ -62,6 +65,7 @@ async function displayQuiz() {
   questions.forEach((question, index) => {
     const questionDiv = document.createElement('div');
     questionDiv.classList.add('question');
+    questionDiv.id = `question-container-${index}`; // Assign a unique ID to each question container
 
     const questionText = document.createElement('p');
     questionText.textContent = `${index + 1}. ${question.questionText}`;
@@ -77,7 +81,7 @@ async function displayQuiz() {
 
         const input = document.createElement('input');
         input.type = 'radio';
-        input.name = `question_${index}`;
+        input.name = `question_${index}`; // Use a unique name for each question's radio buttons
         input.value = option;
 
         label.appendChild(input);
@@ -111,9 +115,7 @@ async function handleQuizSubmission(event) {
   let answersCount = 0;
   let correctAnswersCount = 0;
 
-  resultElement.textContent = "Checking answers...";
-  resultElement.style.color = "gray";
-
+  // --- Start of existing quiz logic for checking answers ---
   loadedQuestions.forEach((question, index) => {
     const questionName = `question_${index}`;
     const selectedOption = form.querySelector(`input[name="${questionName}"]:checked`);
@@ -121,7 +123,7 @@ async function handleQuizSubmission(event) {
     if (!selectedOption) {
       allCorrect = false;
       console.warn(`Question ${index + 1} was not answered.`);
-      return;
+      return; // Skip if not answered for scoring purposes
     }
 
     answersCount++;
@@ -136,11 +138,12 @@ async function handleQuizSubmission(event) {
   });
 
   if (answersCount === 0) {
-      resultElement.textContent = "Please answer at least one question.";
-      resultElement.style.color = "orange";
-      return;
+    resultElement.textContent = "Please answer at least one question.";
+    resultElement.style.color = "orange";
+    return;
   }
 
+  // Display initial scoring feedback
   if (answersCount < loadedQuestions.length) {
     resultElement.textContent = `You answered ${answersCount} out of ${loadedQuestions.length} questions. You got ${correctAnswersCount} correct. Please answer all questions to get full feedback.`;
     resultElement.style.color = "orange";
@@ -149,7 +152,91 @@ async function handleQuizSubmission(event) {
       resultElement.textContent = `🎉 Congratulations! You got all ${correctAnswersCount} questions correct!`;
       resultElement.style.color = "green";
     } else {
-      resultElement.textContent = `You got ${correctAnswersCount} out of ${loadedQuestions.length} questions correct. Keep practicing!`;
+      resultElement.textContent = `You got ${correctAnswersCount} out of ${loadedQuestions.length} questions correct. Now, let's get some AI feedback!`;
+      resultElement.style.color = "red";
+    }
+  }
+
+  // --- Flask server integration for AI feedback ---
+  // If the user answered all questions, proceed to get AI feedback
+  if (answersCount === loadedQuestions.length) {
+    // Update main result message to show AI feedback is loading
+    resultElement.textContent = `You got ${correctAnswersCount} out of ${loadedQuestions.length} questions correct. Thinking... 🤖 Getting AI feedback...`;
+    resultElement.style.color = "gray";
+
+    // IMPORTANT: Clear any previously displayed AI feedback for individual questions
+    // This prevents duplicated feedback if the user submits multiple times
+    document.querySelectorAll('.ai-feedback-per-question').forEach(el => el.remove());
+
+    // Collect all user answers to send to the backend
+    const userAnswers = loadedQuestions.map((question, index) => {
+      const questionName = `question_${index}`;
+      const selectedOption = form.querySelector(`input[name="${questionName}"]:checked`);
+      return {
+        questionText: question.questionText,
+        userAnswer: selectedOption ? selectedOption.value : null,
+        correctAnswer: question.correctAnswer
+      };
+    });
+
+    try {
+      const response = await fetch("http://localhost:5000/get-feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ quizData: userAnswers })
+      });
+
+      const data = await response.json();
+
+      // After fetching, revert resultElement to previous score, or show general status
+      if (allCorrect) {
+        resultElement.textContent = `🎉 Congratulations! You got all ${correctAnswersCount} questions correct!`;
+        resultElement.style.color = "green";
+      } else {
+        resultElement.textContent = `You got ${correctAnswersCount} out of ${loadedQuestions.length} questions correct. Scroll up for AI feedback!`;
+        resultElement.style.color = "red";
+      }
+
+
+      if (data.feedback && Array.isArray(data.feedback)) {
+        // Iterate through the array of feedback objects from the backend
+        data.feedback.forEach(item => {
+          const questionIndex = item.questionIndex;      // Get the index of the question
+          const aiFeedbackText = item.aiFeedback;        // Get the actual feedback text
+          const isCorrect = item.isCorrect;              // Get correctness for styling
+
+          // Find the corresponding question div using its ID (from displayQuiz)
+          const questionDiv = document.getElementById(`question-container-${questionIndex}`);
+
+          if (questionDiv) {
+            const feedbackP = document.createElement('p');
+            feedbackP.classList.add('ai-feedback-per-question'); // Add a class for styling and easy removal
+
+            // Add 'correct' or 'incorrect' class based on the feedback from the backend
+            if (isCorrect) {
+              feedbackP.classList.add('correct');
+            } else {
+              feedbackP.classList.add('incorrect');
+            }
+
+            // Set the innerHTML using the actual AI feedback text
+            feedbackP.innerHTML = `<strong>AI Feedback:</strong> ${aiFeedbackText}`;
+            questionDiv.appendChild(feedbackP); // Append to the specific question's div
+          } else {
+            console.warn(`Could not find question div with ID 'question-container-${questionIndex}'.`);
+          }
+        });
+      } else {
+        // This block handles cases where 'data.feedback' is not an array (e.g., an error from backend)
+        resultElement.innerHTML = resultElement.innerHTML + "<br><br>⚠️ No structured AI response. Backend error or unexpected format.";
+        resultElement.style.color = "red";
+        console.warn("Backend response did not contain structured feedback or was empty:", data);
+      }
+    } catch (error) {
+      console.error("Fetch error contacting Python server:", error);
+      resultElement.innerHTML = resultElement.innerHTML + "<br><br>❌ Error contacting Python server.";
       resultElement.style.color = "red";
     }
   }
